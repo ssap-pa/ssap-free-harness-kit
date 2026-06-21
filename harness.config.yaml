@@ -1,0 +1,25 @@
+# harness.config.yaml
+# Single source of truth for the AI coding harness.
+# Flat keys, shell-parseable (no YAML dependency) so the zero-token gate can read it.
+# Limits (by design, keeps the parser dependency-free): scalar values only — no inline
+# '#' inside a value, and ',' separates list items so it can't appear inside one name.
+#
+# WEAKNESS #2 FIX (model-name rot): model/provider names live HERE, not hardcoded
+# in scripts or the SKILL. Rename a model in one place; the whole harness follows.
+
+# ── Value layer (the moat: subscription / flat-rate auth, NO metered billing) ──
+impl_provider: claude-cli
+impl_model: claude-opus-4-8
+impl_base_url: claude-cli://print
+
+review_provider: openai-codex
+review_model: gpt-5.5
+review_cli: codex                       # invoked: codex exec --skip-git-repo-check -s read-only -m <review_model>
+
+image_provider: chatgpt-backend-image-adapter
+
+# ── Enforcement layer (deterministic, zero-token gate) ──
+gate_required_artifacts: AI_HARNESS_LOG.md
+gate_required_globs: CODEX_REVIEW*.md
+gate_require_verification_evidence: true   # AI_HARNESS_LOG.md must contain an "exit 0" line
+gate_enforce_no_hand_metrics: true         # any token figure must cite a sessions/ path

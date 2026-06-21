@@ -1,0 +1,13 @@
+# local secrets / auth — never commit
+.env
+.env.*
+*.key
+auth.json
+
+# OS / editor noise
+.DS_Store
+*.swp
+
+# transient
+*.log
+tmp/
