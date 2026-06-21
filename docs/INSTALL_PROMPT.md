@@ -35,9 +35,10 @@ Hermes chat. It clones the repo and runs the installer, then verifies on disk.
 5. preflight 결과(exit code)와 두 파일의 존재/첫 줄을 물증으로 보고한다.
    설치가 안 됐으면 안 됐다고 정직하게 말하고, 추정으로 성공을 지어내지 마라.
 
-사전조건(없으면 그 사실을 보고):
-- Codex CLI 설치 + ChatGPT 로그인 (codex login status 가 "Logged in using ChatGPT")
-- Hermes 메인 provider 가 claude-cli / claude-opus-4-8
+사전조건 — 연결할 3가지 (없으면 그 사실을 보고):
+- Claude CLI : 빌드/오케스트레이션 엔진 (Hermes 메인 provider = claude-cli / claude-opus-4-8)
+- Codex CLI : 리뷰/검증 엔진 (npm i -g @openai/codex)
+- ChatGPT 로그인 : Codex CLI 인증 (codex login → codex login status 가 "Logged in using ChatGPT")
 설치 후, 코딩 요청을 보내면 Hermes 가 coding-harness-protocol 을 자동 로드해
 12단계 규약대로 처리하고, 완료 전 bin/gate.sh 게이트를 통과해야 한다.
 ````

@@ -89,12 +89,15 @@ Prefer to let your agent do it? Paste the block in [`docs/INSTALL_PROMPT.md`](do
 into your Hermes chat. After install, any coding request auto-loads the protocol,
 and completion is blocked until `bin/gate.sh` passes.
 
-### Prerequisites
+### Prerequisites — connect these three
 
-- **Codex CLI** installed and signed in with ChatGPT (`codex login status` → *Logged in using ChatGPT*) — the flat-rate review engine.
-- **Hermes** main provider set to `claude-cli` / `claude-opus-4-8` — the flat-rate build engine.
+| Connect | Role | How |
+|---------|------|-----|
+| **Claude CLI** | build / orchestrate engine | Hermes main provider = `claude-cli` / `claude-opus-4-8` |
+| **Codex CLI** | review / verify engine | `npm i -g @openai/codex` |
+| **ChatGPT login** | the auth that powers Codex CLI | `codex login` → `codex login status` shows *Logged in using ChatGPT* |
 
-`bin/preflight.sh` checks both for you.
+`bin/preflight.sh` checks all three for you.
 
 ---
 
