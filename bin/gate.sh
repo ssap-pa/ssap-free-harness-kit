@@ -61,13 +61,40 @@ for g in "${GLOBS[@]}"; do
   if [ "$found" -eq 1 ]; then pass "review artifact matches: $g"; else block "no file matches required pattern: $g"; fi
 done
 
-# (3) Verification must actually have run — demand an "exit 0" line in the log.
+# (3) Verification must actually have RUN — not merely a string that claims it did.
+#     WEAKNESS FIX: the old check passed on ANY 'exit 0' substring, so prose like
+#     "remember to check exit 0" satisfied it without a command ever running.
+#     Two stronger modes (selected in harness.config.yaml):
+#       a) gate_verify_cmd set   → the GATE itself runs that command and gates on its
+#          REAL exit code. Evidence = the gate's own observation of a live process,
+#          which a string written into the log cannot fake.
+#       b) gate_verify_cmd empty → require a STRUCTURED, line-anchored evidence line
+#          ('gate-verify: <cmd> -> exit 0') that ordinary prose cannot trip.
 if [ "$(cfg gate_require_verification_evidence true)" = "true" ]; then
   log="$PROJECT/AI_HARNESS_LOG.md"
-  if [ -f "$log" ] && grep -qE 'exit( code)? 0' "$log"; then
-    pass "verification evidence found (exit 0)"
+  verify_cmd="$(cfg gate_verify_cmd '')"
+  if [ -n "$verify_cmd" ]; then
+    echo "  running verification: $verify_cmd"
+    vout="$(mktemp)"
+    if ( cd "$PROJECT" && eval "$verify_cmd" ) >"$vout" 2>&1; then
+      [ -f "$log" ] && printf 'gate-verify: %s -> exit 0   (executed by gate.sh @ %s)\n' \
+        "$verify_cmd" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$log"
+      pass "verification command ran and exited 0: $verify_cmd"
+    else
+      rc=$?
+      block "verification command FAILED (exit $rc): $verify_cmd"
+      sed 's/^/        /' "$vout" | tail -n 15
+    fi
+    rm -f "$vout"
   else
-    block "no verification evidence — AI_HARNESS_LOG.md needs an 'exit 0' line"
+    # No command configured: demand a structured, anchored evidence line — NOT a
+    # loose 'exit 0' substring. Prose can't satisfy 'gate-verify: <cmd> -> exit 0'.
+    ev_re='^[[:space:]]*gate-verify:[[:space:]]*[^[:space:]].*->[[:space:]]*exit([[:space:]]+code)?[[:space:]]+0[[:space:]]*(\(.*\))?[[:space:]]*$'
+    if [ -f "$log" ] && grep -qE "$ev_re" "$log"; then
+      pass "structured verification evidence found (gate-verify line)"
+    else
+      block "no verification evidence — set 'gate_verify_cmd' in harness.config.yaml so the gate runs your check, or emit a 'gate-verify: <cmd> -> exit 0' line into AI_HARNESS_LOG.md"
+    fi
   fi
 fi
 

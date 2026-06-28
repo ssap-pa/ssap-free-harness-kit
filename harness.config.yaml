@@ -21,5 +21,6 @@ image_provider: chatgpt-backend-image-adapter
 # ── Enforcement layer (deterministic, zero-token gate) ──
 gate_required_artifacts: AI_HARNESS_LOG.md
 gate_required_globs: CODEX_REVIEW*.md
-gate_require_verification_evidence: true   # AI_HARNESS_LOG.md must contain an "exit 0" line
+gate_require_verification_evidence: true   # require proof that verification actually ran (see gate_verify_cmd)
+gate_verify_cmd:                           # STRONG MODE (optional): a command the gate RUNS itself (e.g. "npm run build"). Its real exit code is the proof — a string in the log can't fake it. Empty = require a structured 'gate-verify: <cmd> -> exit 0' line in AI_HARNESS_LOG.md.
 gate_enforce_no_hand_metrics: true         # any token figure must cite a sessions/ path

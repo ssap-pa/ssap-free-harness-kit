@@ -119,8 +119,8 @@ coding request, and the `coding-harness-protocol` skill it triggers. `install.sh
 drops both into your Hermes profile (backing up anything it overwrites):
 
 ```bash
-git clone https://github.com/ssap-pa/ssap-free-harness-kit.git
-cd ssap-free-harness-kit
+git clone https://github.com/ssap-pa/free-Smart-Routing-harness.git
+cd free-Smart-Routing-harness
 ./install.sh --dry-run     # preview — changes nothing
 ./install.sh               # installs ~/.hermes/SOUL.md + the skill (with backups)
 ./bin/preflight.sh         # confirm Claude + Codex reachable on subscription auth
